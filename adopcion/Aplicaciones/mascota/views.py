@@ -120,9 +120,9 @@ def eliminar_mascota(request, id):
 
 
 
-def listar_adopciones(request)
+def listar_adopciones(request):
     adopciones = Adopcion.objects.select_related('persona', 'mascota').all()
-    return render(request, 'mascotas/listar_adopciones.html', {'adopciones': adopciones})
+   
 
 def crear_adopcion(request):
     personas = Persona.objects.all()
