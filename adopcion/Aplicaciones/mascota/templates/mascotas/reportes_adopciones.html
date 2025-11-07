@@ -44,7 +44,6 @@
       </form>
   </div>
 
-  <!-- contenedor de la gráfica de barras -->
   <div class="col-12 col-lg-7">
     <div class="card shadow mb-4">
       <div class="card-body" id="bar-card-body" style="padding:1rem;">
@@ -58,7 +57,6 @@
 {{ chart_labels|json_script:"chart-labels-data" }}
 {{ chart_data|json_script:"chart-values-data" }}
 
-<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -66,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const labels = JSON.parse(document.getElementById('chart-labels-data').textContent || '[]');
     const data = JSON.parse(document.getElementById('chart-values-data').textContent || '[]');
 
-    // Colores (igual que tu template que funciona)
     const baseColors = [
         "rgba(255, 99, 71, 0.85)",
         "rgba(54, 162, 235, 0.85)",
@@ -82,15 +79,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const minCanvasHeight = 260; // altura mínima del canvas
     const containerMax = 780;    // altura máxima visible en la tarjeta -> scroll si supera
 
-    // Calcular altura necesaria para dibujar todas las barras
     const neededHeight = Math.max(minCanvasHeight, Math.max(labels.length, 1) * perLabel);
 
-    // Preparar canvas y buffer real (devicePixelRatio para pantallas retina)
     const canvas = document.getElementById('chartAdopcionesBar');
     const cardBody = document.getElementById('bar-card-body');
     const ratio = window.devicePixelRatio || 1;
 
-    // Tomar ancho real disponible (fallbacks)
     let clientWidth = canvas.clientWidth || (canvas.parentElement ? canvas.parentElement.clientWidth : 900);
     if (!clientWidth) {
         const rect = canvas.getBoundingClientRect();
@@ -100,15 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const bufferWidth = Math.round(clientWidth * ratio);
     const bufferHeight = Math.round(neededHeight * ratio);
 
-    // Asignar atributos al canvas (buffer real)
     canvas.width = bufferWidth;
     canvas.height = bufferHeight;
 
-    // Asignar estilo CSS para layout (alto en CSS)
     canvas.style.width = '100%';
     canvas.style.height = neededHeight + 'px';
 
-    // Si la altura necesaria excede containerMax, permitimos scroll en el card-body
     if (neededHeight > containerMax) {
         cardBody.style.maxHeight = containerMax + 'px';
         cardBody.style.overflowY = 'auto';
@@ -117,12 +108,10 @@ document.addEventListener('DOMContentLoaded', function() {
         cardBody.style.overflowY = 'hidden';
     }
 
-    // Destruir chart previo si existe
     if (window._adopcionesBarChart instanceof Chart) {
         try { window._adopcionesBarChart.destroy(); } catch(e){/* ignore */ }
     }
 
-    // Crear chart: mantengo responsive:true y maintainAspectRatio:false (igual que template que funciona)
     window._adopcionesBarChart = new Chart(canvas, {
         type: 'bar',
         data: {
@@ -165,8 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
             layout: { padding: { top: 8, bottom: 8 } }
         }
     });
-
-    // Forzar update por si hay redimensionamientos
     try { window._adopcionesBarChart.update(); } catch(e){/*ignore*/}
 
     // Pie chart (fijo)
@@ -195,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Reconstruir al cambiar tamaño de ventana para recalcular buffer
     let _resizeTimeout = null;
     window.addEventListener('resize', function() {
         if (_resizeTimeout) clearTimeout(_resizeTimeout);
@@ -210,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-/* estilo mínimo para que el canvas se comporte bien */
 #bar-card-body { padding: 1rem; }
 #bar-card-body canvas { display: block; width: 100%; }
 </style>
