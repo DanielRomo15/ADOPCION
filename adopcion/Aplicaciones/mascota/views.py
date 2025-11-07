@@ -132,7 +132,8 @@ def crear_adopcion(request):
         mascota_id = request.POST.get('mascota')
         fecha_adopcion = request.POST.get('fecha_adopcion')
         observaciones = request.POST.get('observaciones')
-    if not (persona_id and mascota_id and fecha_adopcion):
+        
+        if not (persona_id and mascota_id and fecha_adopcion):
             messages.error(request, 'Debe seleccionar Persona, Mascota y Fecha de Adopción.')
             return redirect('crear_adopcion')
        
@@ -158,10 +159,7 @@ def crear_adopcion(request):
         'mascotas': mascotas,
     })
 
-def editar_adopcion(request, id):
-    adopcion = get_object_or_404(Adopcion, id=id)
-    personas = Persona.objects.all()
-    mascotas = Mascota.objects.all()
+aaaa
     
     if request.method == 'POST':
         persona_id = request.POST.get('persona')
