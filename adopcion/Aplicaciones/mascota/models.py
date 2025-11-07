@@ -28,7 +28,7 @@ class Mascota(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.tipo} - {self.raza})"
 
-
+class Adopcion(models.Model):
 
 
     def __str__(self):
