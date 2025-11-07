@@ -192,7 +192,14 @@ def crear_adopcion(request):
         'mascotas': mascotas,
     })
 
-aaaa
+def eliminar_adopcion(request, id):
+    adopcion = get_object_or_404(Adopcion, id=id)
+    mascota = adopcion.mascota
+    mascota.estado = 'disponible'
+    mascota.save()
+    adopcion.delete()
+    messages.success(request, 'Adopción eliminada correctamente.')
+    return redirect('listar_adopciones')
 # ---- Vista para reportes de adopciones ----
 def reportes_adopciones(request):
     """
