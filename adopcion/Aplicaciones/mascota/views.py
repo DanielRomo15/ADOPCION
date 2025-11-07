@@ -118,9 +118,9 @@ def eliminar_mascota(request, id):
     return redirect('listar_mascotas')
 
 
-# --- ADOPCION ---
 
-def listar_adopciones(request):
+
+def listar_adopciones(request)
     adopciones = Adopcion.objects.select_related('persona', 'mascota').all()
     return render(request, 'mascotas/listar_adopciones.html', {'adopciones': adopciones})
 
