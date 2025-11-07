@@ -132,7 +132,9 @@ def crear_adopcion(request):
         mascota_id = request.POST.get('mascota')
         fecha_adopcion = request.POST.get('fecha_adopcion')
         observaciones = request.POST.get('observaciones')
-
+    if not (persona_id and mascota_id and fecha_adopcion):
+            messages.error(request, 'Debe seleccionar Persona, Mascota y Fecha de Adopción.')
+            return redirect('crear_adopcion')
        
 
         persona = get_object_or_404(Persona, id=persona_id)
