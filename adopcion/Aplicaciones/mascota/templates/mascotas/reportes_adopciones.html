@@ -1,0 +1,218 @@
+{% extends './index.html' %}
+{% block body %}
+{% load static %}
+
+<h2 class="mb-4 text-center"><i class="fa fa-chart-bar"></i> Reportes de adopciones de mascotas</h2>
+
+<div class="mb-4 text-center">
+    <a href="{% url 'listar_adopciones' %}" class="btn btn-secondary me-2">
+        <i class="fa fa-arrow-left"></i> Volver al listado
+    </a>
+</div>
+
+<div class="row justify-content-center align-items-start mb-4">
+  <!-- filtros + pastel -->
+  <div class="col-12 col-lg-3 mb-3 d-flex flex-column align-items-center">
+      <div class="card shadow w-100 mb-3">
+        <div class="card-body d-flex justify-content-center align-items-center">
+          <canvas id="chartAdopcionesPie" width="200" height="200"></canvas>
+        </div>
+      </div>
+
+      <form method="get" class="w-100 text-center">
+        <div class="mb-2"><label style="font-weight:500;">Periodo:</label></div>
+        <div class="btn-group mb-3 w-100" role="group" aria-label="Filtros">
+          <input type="hidden" name="top" value="{{ top|default:'10' }}">
+          <a href="?filtro=todo&top={{top|default:'10'}}" class="btn btn-outline-primary {% if filtro == 'todo' %}active{% endif %}">Todo</a>
+          <a href="?filtro=dia&top={{top|default:'10'}}" class="btn btn-outline-primary {% if filtro == 'dia' %}active{% endif %}">Hoy</a>
+          <a href="?filtro=mes&top={{top|default:'10'}}" class="btn btn-outline-primary {% if filtro == 'mes' %}active{% endif %}">Este mes</a>
+          <a href="?filtro=anio&top={{top|default:'10'}}" class="btn btn-outline-primary {% if filtro == 'anio' %}active{% endif %}">Este año</a>
+        </div>
+
+        <div class="mb-2">
+          <label style="font-weight:500;">Mostrar:</label>
+          <select name="top" onchange="this.form.submit()" class="form-select d-inline-block mt-2" style="width:auto;">
+            <option value="5" {% if top == '5' %}selected{% endif %}>Top 5</option>
+            <option value="10" {% if top == '10' or not top %}selected{% endif %}>Top 10</option>
+            <option value="20" {% if top == '20' %}selected{% endif %}>Top 20</option>
+            <option value="50" {% if top == '50' %}selected{% endif %}>Top 50</option>
+            <option value="100" {% if top == '100' %}selected{% endif %}>Top 100</option>
+            <option value="all" {% if top == 'all' %}selected{% endif %}>Todos</option>
+          </select>
+          <span>tipos de mascota</span>
+        </div>
+      </form>
+  </div>
+
+  <!-- contenedor de la gráfica de barras -->
+  <div class="col-12 col-lg-7">
+    <div class="card shadow mb-4">
+      <div class="card-body" id="bar-card-body" style="padding:1rem;">
+        <!-- colocamos atributos width/height vacíos; se ajustan en JS -->
+        <canvas id="chartAdopcionesBar"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ chart_labels|json_script:"chart-labels-data" }}
+{{ chart_data|json_script:"chart-values-data" }}
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Datos
+    const labels = JSON.parse(document.getElementById('chart-labels-data').textContent || '[]');
+    const data = JSON.parse(document.getElementById('chart-values-data').textContent || '[]');
+
+    // Colores (igual que tu template que funciona)
+    const baseColors = [
+        "rgba(255, 99, 71, 0.85)",
+        "rgba(54, 162, 235, 0.85)",
+        "rgba(255, 99, 71, 0.4)",
+        "rgba(54,162,235,0.4)",
+        "#ff5733", "#1e4fff","#e14d4c","#2a72c4","#ffc8b0","#71aee7"
+    ];
+    const backgroundColors = labels.map((_, i) => baseColors[i % baseColors.length]);
+    const borderColors = labels.map((_, i) => baseColors[i % 2]);
+
+    // Parámetros de tamaño
+    const perLabel = 34;         // px por etiqueta (ajusta si quieres más compacto)
+    const minCanvasHeight = 260; // altura mínima del canvas
+    const containerMax = 780;    // altura máxima visible en la tarjeta -> scroll si supera
+
+    // Calcular altura necesaria para dibujar todas las barras
+    const neededHeight = Math.max(minCanvasHeight, Math.max(labels.length, 1) * perLabel);
+
+    // Preparar canvas y buffer real (devicePixelRatio para pantallas retina)
+    const canvas = document.getElementById('chartAdopcionesBar');
+    const cardBody = document.getElementById('bar-card-body');
+    const ratio = window.devicePixelRatio || 1;
+
+    // Tomar ancho real disponible (fallbacks)
+    let clientWidth = canvas.clientWidth || (canvas.parentElement ? canvas.parentElement.clientWidth : 900);
+    if (!clientWidth) {
+        const rect = canvas.getBoundingClientRect();
+        clientWidth = rect.width || 900;
+    }
+    // buffer en device pixels
+    const bufferWidth = Math.round(clientWidth * ratio);
+    const bufferHeight = Math.round(neededHeight * ratio);
+
+    // Asignar atributos al canvas (buffer real)
+    canvas.width = bufferWidth;
+    canvas.height = bufferHeight;
+
+    // Asignar estilo CSS para layout (alto en CSS)
+    canvas.style.width = '100%';
+    canvas.style.height = neededHeight + 'px';
+
+    // Si la altura necesaria excede containerMax, permitimos scroll en el card-body
+    if (neededHeight > containerMax) {
+        cardBody.style.maxHeight = containerMax + 'px';
+        cardBody.style.overflowY = 'auto';
+    } else {
+        cardBody.style.maxHeight = neededHeight + 'px';
+        cardBody.style.overflowY = 'hidden';
+    }
+
+    // Destruir chart previo si existe
+    if (window._adopcionesBarChart instanceof Chart) {
+        try { window._adopcionesBarChart.destroy(); } catch(e){/* ignore */ }
+    }
+
+    // Crear chart: mantengo responsive:true y maintainAspectRatio:false (igual que template que funciona)
+    window._adopcionesBarChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Número de adopciones',
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 2,
+                borderRadius: 8,
+                barPercentage: 0.7,
+                categoryPercentage: 0.7,
+                maxBarThickness: 36
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Tipos de Mascota por # de Adopciones',
+                    font: { weight: 'bold', size: 20 }
+                },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    min: 0,
+                    ticks: { stepSize: 1, precision: 0, font: { size: 14, weight: 'bold' } }
+                },
+                y: {
+                    ticks: { font: { size: 14, weight: 'bold' }, autoSkip: false }
+                }
+            },
+            layout: { padding: { top: 8, bottom: 8 } }
+        }
+    });
+
+    // Forzar update por si hay redimensionamientos
+    try { window._adopcionesBarChart.update(); } catch(e){/*ignore*/}
+
+    // Pie chart (fijo)
+    if (window._adopcionesPieChart instanceof Chart) {
+        try { window._adopcionesPieChart.destroy(); } catch(e){/*ignore*/ }
+    }
+    const pieCanvas = document.getElementById('chartAdopcionesPie');
+    new Chart(pieCanvas, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Número de adopciones',
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: "#fff",
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Distribución por Tipo', font: { weight: 'bold', size: 14 } }
+            }
+        }
+    });
+
+    // Reconstruir al cambiar tamaño de ventana para recalcular buffer
+    let _resizeTimeout = null;
+    window.addEventListener('resize', function() {
+        if (_resizeTimeout) clearTimeout(_resizeTimeout);
+        _resizeTimeout = setTimeout(function() {
+            // destruimos y volvemos a ejecutar todo (recargar la página también sirve)
+            try { window._adopcionesBarChart.destroy(); } catch(e){/*ignore*/ }
+            // re-ejecutar función para ajustar (simples manera: recargar)
+            location.reload(); // decisión simple y segura: recarga la vista y recalcula con ancho correcto
+        }, 250);
+    });
+});
+</script>
+
+<style>
+/* estilo mínimo para que el canvas se comporte bien */
+#bar-card-body { padding: 1rem; }
+#bar-card-body canvas { display: block; width: 100%; }
+</style>
+
+{% endblock %}

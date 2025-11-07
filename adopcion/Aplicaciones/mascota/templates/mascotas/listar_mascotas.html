@@ -1,0 +1,35 @@
+{% extends './index.html' %}
+{% block title %}Listado de Mascotas{% endblock %}
+
+{% block body %}
+<h1>Listado de Mascotas</h1>
+<a href="{% url 'crear_mascota' %}" class="btn btn-primary mb-3">Agregar Mascota</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th><th>Nombre</th><th>Tipo</th><th>Raza</th><th>Sexo</th><th>Fecha Ingreso</th><th>Estado</th><th>Observaciones</th><th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mascota in mascotas %}
+        <tr>
+            <td>{{ mascota.id }}</td>
+            <td>{{ mascota.nombre }}</td>
+            <td>{{ mascota.tipo }}</td>
+            <td>{{ mascota.raza }}</td>
+            <td>{{ mascota.sexo }}</td>
+            <td>{{ mascota.fecha_ingreso }}</td>
+            <td>{{ mascota.estado }}</td>
+            <td>{{ mascota.observaciones }}</td>
+            <td>
+                <a href="{% url 'editar_mascota' mascota.id %}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{% url 'eliminar_mascota' mascota.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar esta mascota?');">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9">No hay mascotas registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends './index.html' %}
+{% block title %}Registrar Adopción{% endblock %}
+
+{% block body %}
+<h1>Registrar Nueva Adopción</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Persona:</label>
+    <select name="persona" class="form-select mb-2" required>
+        <option value="" disabled selected>Seleccione una persona</option>
+        {% for persona in personas %}
+        <option value="{{ persona.id }}">{{ persona.nombre }} {{ persona.apellido }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Mascota:</label>
+    <select name="mascota" class="form-select mb-2" required>
+        <option value="" disabled selected>Seleccione una mascota</option>
+        {% for mascota in mascotas %}
+        <option value="{{ mascota.id }}">{{ mascota.nombre }} - {{ mascota.tipo }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Fecha de Adopción:</label>
+    <input type="date" name="fecha_adopcion" required class="form-control mb-2">
+
+    <label>Observaciones:</label>
+    <textarea name="observaciones" class="form-control mb-2"></textarea>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="{% url 'listar_adopciones' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

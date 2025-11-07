@@ -1,0 +1,35 @@
+{% extends './index.html' %}
+{% block title %}Listado de Adopciones{% endblock %}
+
+{% block body %}
+<h1>Listado de Adopciones</h1>
+<a href="{% url 'reportes_adopciones' %}" class="btn btn-success mb-3 me-2">
+    <i class="fa fa-chart-bar"></i> Reportes
+</a>
+
+<a href="{% url 'crear_adopcion' %}" class="btn btn-primary mb-3">Registrar Adopción</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th><th>Persona</th><th>Mascota</th><th>Fecha Adopción</th><th>Observaciones</th><th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for adopcion in adopciones %}
+        <tr>
+            <td>{{ adopcion.id }}</td>
+            <td>{{ adopcion.persona }}</td>
+            <td>{{ adopcion.mascota }}</td>
+            <td>{{ adopcion.fecha_adopcion }}</td>
+            <td>{{ adopcion.observaciones }}</td>
+            <td>
+                <a href="{% url 'eliminar_adopcion' adopcion.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar esta adopción?');">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No hay adopciones registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends './index.html' %}
+{% block title %}Editar Adopción{% endblock %}
+
+{% block body %}
+<h1>Editar Adopción</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{ adopcion.id }}">
+
+    <label>Persona:</label>
+    <select name="persona" class="form-select mb-2" required>
+        {% for persona in personas %}
+        <option value="{{ persona.id }}" {% if persona.id == adopcion.persona.id %}selected{% endif %}>
+            {{ persona.nombre }} {{ persona.apellido }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <label>Mascota:</label>
+    <select name="mascota" class="form-select mb-2" required>
+        {% for mascota in mascotas %}
+        <option value="{{ mascota.id }}" {% if mascota.id == adopcion.mascota.id %}selected{% endif %}>
+            {{ mascota.nombre }} - {{ mascota.tipo }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <label>Fecha de Adopción:</label>
+    <input type="date" name="fecha_adopcion" value="{{ adopcion.fecha_adopcion }}" class="form-control mb-2" required>
+
+    <label>Observaciones:</label>
+    <textarea name="observaciones" class="form-control mb-2">{{ adopcion.observaciones }}</textarea>
+
+    <button type="submit" class="btn btn-success">Actualizar</button>
+    <a href="{% url 'listar_adopciones' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

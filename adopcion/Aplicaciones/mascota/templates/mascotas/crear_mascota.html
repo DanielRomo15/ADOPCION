@@ -1,0 +1,36 @@
+{% extends './index.html' %}
+{% block title %}Crear Mascota{% endblock %}
+
+{% block body %}
+<h1>Crear Nueva Mascota</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Nombre:</label>
+    <input type="text" name="nombre" required class="form-control mb-2">
+
+    <label>Tipo:</label>
+    <input type="text" name="tipo" required class="form-control mb-2">
+
+    <label>Raza:</label>
+    <input type="text" name="raza" class="form-control mb-2">
+
+    <label>Sexo:</label>
+    <input type="text" name="sexo" class="form-control mb-2">
+
+    <label>Fecha de Ingreso:</label>
+    <input type="date" name="fecha_ingreso" required class="form-control mb-2">
+
+    <label>Estado:</label>
+    <select name="estado" class="form-select mb-2" required>
+        <option value="disponible">Disponible</option>
+        <option value="no_disponible">No Disponible</option>
+    </select>
+
+    <label>Observaciones:</label>
+    <textarea name="observaciones" class="form-control mb-2"></textarea>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="{% url 'listar_mascotas' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

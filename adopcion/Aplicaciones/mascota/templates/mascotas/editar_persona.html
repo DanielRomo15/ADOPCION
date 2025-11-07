@@ -1,0 +1,29 @@
+{% extends './index.html' %}
+{% block title %}Editar Persona{% endblock %}
+
+{% block body %}
+<h1>Editar Persona</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{ persona.id }}">
+    
+    <label>Nombre:</label>
+    <input type="text" name="nombre" value="{{ persona.nombre }}" required class="form-control mb-2">
+
+    <label>Apellido:</label>
+    <input type="text" name="apellido" value="{{ persona.apellido }}" required class="form-control mb-2">
+
+    <label>Cédula:</label>
+    <input type="text" name="cedula" value="{{ persona.cedula }}" required class="form-control mb-2">
+
+    <label>Teléfono:</label>
+    <input type="text" name="telefono" value="{{ persona.telefono }}" class="form-control mb-2">
+
+    <label>Dirección:</label>
+    <input type="text" name="direccion" value="{{ persona.direccion }}" class="form-control mb-2">
+
+    <button type="submit" class="btn btn-success">Actualizar</button>
+    <a href="{% url 'listar_personas' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
