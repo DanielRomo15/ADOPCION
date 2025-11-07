@@ -201,7 +201,7 @@ def eliminar_adopcion(request, id):
     messages.success(request, 'Adopción eliminada correctamente.')
     return redirect('listar_adopciones')
 # ---- Vista para reportes de adopciones ----
-a
+def reportes_adopciones(request):
     """
     Genera datos para gráficos: agrupa por mascota__tipo y cuenta adopciones (COUNT).
     Soporta filtros GET: filtro = todo|dia|mes|anio   y top = 5|10|20|50|100|all
