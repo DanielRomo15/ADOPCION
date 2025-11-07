@@ -159,7 +159,10 @@ def crear_adopcion(request):
         'mascotas': mascotas,
     })
 
-aaaa
+    def editar_adopcion(request, id):
+        adopcion = get_object_or_404(Adopcion, id=id)
+        personas = Persona.objects.all()
+        mascotas = Mascota.objects.all()
     
     if request.method == 'POST':
         persona_id = request.POST.get('persona')
