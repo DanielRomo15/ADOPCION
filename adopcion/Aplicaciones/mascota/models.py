@@ -29,6 +29,10 @@ class Mascota(models.Model):
         return f"{self.nombre} ({self.tipo} - {self.raza})"
 
 class Adopcion(models.Model):
+    persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+    mascota = models.ForeignKey(Mascota, on_delete=models.CASCADE)
+    fecha_adopcion = models.DateField()
+    observaciones = models.TextField(null=True, blank=True)
 
 
     def __str__(self):
